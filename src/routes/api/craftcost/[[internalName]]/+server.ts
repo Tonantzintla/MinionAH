@@ -27,12 +27,17 @@ let allItems;
 let allItemPrices = {} as Record<string, number>;
 const nameMappingsUrl = "https://raw.githubusercontent.com/DarthGigi/MinionAH-NotEnoughUpdates-REPO/refs/heads/master/recipes/recipes.json";
 try {
-  const [itemsResponse, itemsPriceResponse] = await Promise.all([fetch(nameMappingsUrl), fetch(`https://api.hypixel.net/v2/skyblock/bazaar`)]);
+  const [itemsResponse, itemsPriceResponse, skyhelperPricesResponse] = await Promise.all([fetch(nameMappingsUrl), fetch(`https://api.hypixel.net/v2/skyblock/bazaar`), fetch(`https://raw.githubusercontent.com/SkyHelperBot/Prices/refs/heads/main/pricesV2.json`)]);
 
   allItems = await itemsResponse.json();
   const allItemPricesJson = await itemsPriceResponse.json();
   for (const [id, data] of Object.entries(allItemPricesJson.products as Record<string, { quick_status: { buyPrice: number } }>)) {
     allItemPrices[id] = data.quick_status.buyPrice;
+  }
+
+  const skyhelperPricesJson = await skyhelperPricesResponse.json();
+  for (const [id, data] of Object.entries(skyhelperPricesJson as Record<string, number>)) {
+    allItemPrices[id] ??= data;
   }
 } catch (e) {
   console.error("Failed to fetch data:", e);
