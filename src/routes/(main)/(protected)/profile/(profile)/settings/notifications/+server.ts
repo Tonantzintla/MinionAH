@@ -73,7 +73,7 @@ export const POST: RequestHandler = async ({ locals, fetch, request }) => {
               credential: cert({
                 clientEmail: FIREBASE_SERVICE_CLIENT_EMAIL,
                 projectId: FIREBASE_SERVICE_PROJECT_ID,
-                privateKey: FIREBASE_SERVICE_PRIVATE_KEY.replace(/\\n/gm, "\n")
+                privateKey: Buffer.from(FIREBASE_SERVICE_PRIVATE_KEY, "base64").toString("utf-8")
               })
             },
             "admin"
