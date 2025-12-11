@@ -106,6 +106,7 @@
     "tailwind-merge": "^2.6.0",
     "tailwind-variants": "^0.2.1"
   },
+  "packageManager": "pnpm@10.25.0",
   "engines": {
     "node": "^24",
     "pnpm": "^10",
