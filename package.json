@@ -106,10 +106,9 @@
     "tailwind-merge": "^2.6.0",
     "tailwind-variants": "^0.2.1"
   },
-  "packageManager": "pnpm@10.25.0",
   "engines": {
-    "node": "^24",
-    "pnpm": "^10",
+    "node": "^22",
+    "pnpm": "^9 || ^10",
     "deno": "forbidden, use node instead",
     "npm": "forbidden, use pnpm instead",
     "yarn": "forbidden, use pnpm instead",
