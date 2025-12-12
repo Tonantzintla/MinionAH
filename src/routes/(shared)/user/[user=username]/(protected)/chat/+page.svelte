@@ -18,7 +18,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { beforeNavigate, goto } from "$app/navigation";
-  import { PUBLIC_cluster, PUBLIC_key } from "$env/static/public";
+  import { PUBLIC_SOCKUDO_HOST, PUBLIC_SOCKUDO_KEY, PUBLIC_SOCKUDO_USE_TLS } from "$env/static/public";
   import { MinionCard } from "$lib/components/card";
   import Tiptap from "$lib/components/chat/Tiptap.svelte";
   import ChatLoading from "$lib/components/chat/chat-loading.svelte";
@@ -40,8 +40,14 @@
 
   const chatExists = data.chat !== null;
   const pusher = chatExists
-    ? new Pusher(PUBLIC_key, {
-        cluster: PUBLIC_cluster
+    ? new Pusher(PUBLIC_SOCKUDO_KEY, {
+        wsHost: PUBLIC_SOCKUDO_HOST,
+        wsPort: 80,
+        wssPort: 443,
+        forceTLS: PUBLIC_SOCKUDO_USE_TLS === "true",
+        disableStats: true, // Recommended for self-hosted solutions
+        enabledTransports: ["ws", "wss"], // Ensure 'ws' and 'wss' are enabled
+        cluster: ""
       })
     : null;
 

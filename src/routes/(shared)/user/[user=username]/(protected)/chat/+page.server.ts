@@ -1,5 +1,5 @@
-import { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET, app_id, secret } from "$env/static/private";
-import { PUBLIC_cluster, PUBLIC_key } from "$env/static/public";
+import { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET, SOCKUDO_APP_ID, SOCKUDO_SECRET } from "$env/static/private";
+import { PUBLIC_SOCKUDO_HOST, PUBLIC_SOCKUDO_KEY } from "$env/static/public";
 import { sanitize } from "@jill64/universal-sanitizer";
 import { error, fail, redirect } from "@sveltejs/kit";
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
@@ -253,10 +253,11 @@ export const actions = {
       const messaging = getMessaging(firebaseApp);
 
       const pusher = new Pusher({
-        appId: app_id,
-        key: PUBLIC_key,
-        secret: secret,
-        cluster: PUBLIC_cluster,
+        appId: SOCKUDO_APP_ID,
+        key: PUBLIC_SOCKUDO_KEY,
+        secret: SOCKUDO_SECRET,
+        host: PUBLIC_SOCKUDO_HOST,
+        port: "443",
         useTLS: true
       });
 
