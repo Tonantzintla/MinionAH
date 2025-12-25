@@ -132,7 +132,7 @@
         If you need a specific item, you can send a <code>GET</code> request to <code>https://minionah.com/api/craftcost/{"{item}"}</code>
       </p>
       <p>
-        Replace <code>{"{item}"}</code> with the internal item name, you can find a list of all the internal item names at <a href="https://github.com/kr45732/skyblock-plus-data/blob/main/InternalNameMappings.json" target="_blank">kr45732/skyblock-plus-data/InternalNameMappings.json</a>.
+        Replace <code>{"{item}"}</code> with the internal item name, you can find a list of all the internal item names at <a href="https://github.com/DarthGigi/MinionAH-NotEnoughUpdates-REPO/blob/master/recipes/recipes.json" target="_blank">DarthGigi/MinionAH-NotEnoughUpdates-REPO/recipes/recipes.json</a>.
       </p>
       <p>The API will return a JSON object with the raw craft cost of the specified item:</p>
       {#await codeToHtml(JSON.stringify(JSON.parse('{"WOOD_AXE": 126.02217354265548}'), null, 2), { lang: "json", theme: "github-dark-dimmed", transformers: [{ pre(node) {

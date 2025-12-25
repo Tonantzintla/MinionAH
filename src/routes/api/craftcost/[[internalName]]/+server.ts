@@ -124,7 +124,7 @@ export const GET: RequestHandler = async ({ params }) => {
     // If the item object is empty, return a 404 response with an error message
     if (Object.keys(item).length === 0) {
       return json(
-        { error: `Item not found`, message: `The item '${internalName}' was not found. Please check 'InternalNameMappings.json' for a list of all Hypixel Skyblock items. Consult the documentation for more information: https://minionah.com/api/craftcost/docs.`, item: internalName, url: nameMappingsUrl },
+        { error: `Item not found`, message: `The item '${internalName}' was not found. Please check 'recipes.json' for a list of all Hypixel Skyblock items. Consult the documentation for more information: https://minionah.com/api/craftcost/docs.`, item: internalName, url: nameMappingsUrl },
         {
           headers: {
             "Access-Control-Allow-Origin": "*",
