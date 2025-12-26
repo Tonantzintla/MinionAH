@@ -8,11 +8,14 @@
 
   export let data: PageData;
 
-  const calculateMinionStats = (minions: Minion[], auctions: { minion_id: string; price: number }[]) => {
+  const calculateMinionStats = (minions: Minion[], auctions: { minion_id: string; price: number; hasFreeWill: boolean; hasInfusion: boolean }[]) => {
     return minions.map((minion) => {
       const minionAuctions = auctions.filter((a) => a.minion_id === minion.id);
       const auctionCount = minionAuctions.length;
-      const averagePrice = auctionCount > 0 ? minionAuctions.reduce((acc, curr) => acc + curr.price, 0) / auctionCount : 0;
+
+      const validAuctionsForPrice = minionAuctions.filter((a) => !a.hasFreeWill && !a.hasInfusion);
+      const averagePrice = validAuctionsForPrice.length > 0 ? validAuctionsForPrice.reduce((acc, curr) => acc + curr.price, 0) / validAuctionsForPrice.length : 0;
+
       return { ...minion, auctionCount, averagePrice };
     });
   };
@@ -107,8 +110,11 @@
     </div>
   {:then [minions, auctions]}
     <DataTable data={calculateMinionStats(minions, auctions)} />
-    <p class="mx-auto w-fit text-xs text-muted-foreground/50">Are you a developer? Check out the <a href="/api/craftcost/docs" class="underline">API</a></p>
-  {:catch}
+    {:catch}
     <p class="text-destructive-foreground">Something went wrong, try refreshing the page. If the problem persists, please submit a bug report or contact us.</p>
-  {/await}
+    {/await}
+    <p class="mx-auto w-fit text-xs text-muted-foreground/50 mb-4">
+      Auctions with either Free Will or Infusion are not included in the average price.
+    </p>
+    <p class="mx-auto w-fit text-xs text-muted-foreground/50">Are you a developer? Check out the <a href="/api/craftcost/docs" class="underline">API</a></p>
 </div>
