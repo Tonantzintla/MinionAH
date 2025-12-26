@@ -1,5 +1,5 @@
 import { dev } from "$app/environment";
-import { ADMIN_ID, CRON_SECRET, DISCORD_BOT_API_SECRET, MAINTENANCE_MODE, RATE_LIMIT_SECRET } from "$env/static/private";
+import { ADMIN_ID, MAINTENANCE_MODE, RATE_LIMIT_SECRET } from "$env/static/private";
 import { PUBLIC_SENTRY_DSN } from "$env/static/public";
 import { validateSessionToken } from "$lib/server/lucia/auth";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from "$lib/server/lucia/cookies";
@@ -51,18 +51,18 @@ export const handle: Handle = sequence(sentryHandle(), async ({ event, resolve }
 
   const authHeader = event.request.headers.get("Authorization");
 
-  if (!authHeader && ((authHeader !== `Bearer ${CRON_SECRET}` && !dev) || event.request.headers.get("Authorization") !== DISCORD_BOT_API_SECRET)) {
-    await limiter.cookieLimiter?.preflight(event);
+  // if (!authHeader && ((authHeader !== `Bearer ${CRON_SECRET}` && !dev) || event.request.headers.get("Authorization") !== DISCORD_BOT_API_SECRET)) {
+  //   await limiter.cookieLimiter?.preflight(event);
 
-    const status = await limiter.check(event);
-    if (status.limited) {
-      console.warn("Rate limit activated:", event.getClientAddress());
-      return new Response(`You are being rate limited. Please try after ${status.retryAfter} seconds.`, {
-        status: 429,
-        headers: { "Retry-After": status.retryAfter.toString() }
-      });
-    }
-  }
+  //   const status = await limiter.check(event);
+  //   if (status.limited) {
+  //     console.warn("Rate limit activated:", event.getClientAddress());
+  //     return new Response(`You are being rate limited. Please try after ${status.retryAfter} seconds.`, {
+  //       status: 429,
+  //       headers: { "Retry-After": status.retryAfter.toString() }
+  //     });
+  //   }
+  // }
 
   try {
     const token = event.cookies.get("session") ?? null;

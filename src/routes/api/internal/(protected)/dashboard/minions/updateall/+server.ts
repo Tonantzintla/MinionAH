@@ -34,13 +34,14 @@ cloudinary.config({
 
 async function fetchTextures(minions: MinionWithTexture[], type: "skin" | "head") {
   try {
+    const realType = type === "head" ? "headiso" : "skin";
     const textureRequests = minions.map((minion) => ({
       minion,
       promise: () =>
-        fetch(`https://mc-heads.net/${type}/${minion.texture}`)
+        fetch(`https://nmsr.nickac.dev/${realType}/${minion.texture}?no=shadow`)
           .then((response): TextureSuccess => {
             // Check if the response indicates a valid account/texture
-            const isValidTexture = response.headers.get("X-Account-Valid") !== "false";
+            const isValidTexture = response.headers.get("X-Nmsr-Fallback") !== "false";
             if (!isValidTexture) {
               throw new Error("Invalid texture - default Steve skin returned");
             }

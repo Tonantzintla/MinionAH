@@ -50,6 +50,17 @@ export const GET: RequestHandler = async () => {
     delete minion.skin;
   });
 
+  // For local debugging, get all the types of minions currently in the database and compare it to the fetched minions, show which minions are missing/newly added
+
+  const existingMinionsList = await prisma.minion.findMany();
+  const existingMinionNames = existingMinionsList.map((minion) => minion.name);
+  const fetchedMinionNames = minions.map((minion) => minion.name);
+  const missingMinions = existingMinionNames.filter((name) => !fetchedMinionNames.includes(name));
+  const newMinions = fetchedMinionNames.filter((name) => !existingMinionNames.includes(name));
+
+  console.log("Missing minions:", missingMinions);
+  console.log("New minions:", newMinions);
+
   // give back a .json file
   return json(minions);
 };

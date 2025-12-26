@@ -8,11 +8,11 @@
   import { formatNumber } from "$lib/utilities";
   import { cn } from "$lib/utils";
   import ArrowDown01 from "lucide-svelte/icons/arrow-down-0-1";
+  import ArrowDown10 from "lucide-svelte/icons/arrow-down-1-0";
   import ArrowDownAZ from "lucide-svelte/icons/arrow-down-a-z";
-  import ArrowUp01 from "lucide-svelte/icons/arrow-up-0-1";
-  import ArrowUpAZ from "lucide-svelte/icons/arrow-up-a-z";
-  import ArrowUpDown from "lucide-svelte/icons/arrow-up-down";
+  import ArrowDownZA from "lucide-svelte/icons/arrow-down-z-a";
   import ChevronDown from "lucide-svelte/icons/chevron-down";
+  import Funnel from "lucide-svelte/icons/funnel";
   import { createRender, createTable, Render, Subscribe } from "svelte-headless-table";
   import { addHiddenColumns, addPagination, addSortBy, addTableFilter } from "svelte-headless-table/plugins";
   import { readable } from "svelte/store";
@@ -20,7 +20,12 @@
   import DataTableMinion from "./data-table-minion.svelte";
   import DataTableTier from "./data-table-tier.svelte";
 
-  export let data: Minion[];
+  interface MinionWithStats extends Minion {
+    averagePrice: number;
+    auctionCount: number;
+  }
+
+  export let data: MinionWithStats[];
 
   const table = createTable(readable(data), {
     page: addPagination({
@@ -80,6 +85,15 @@
         }
       },
       cell: ({ value }) => formatNumber(value)
+    }),
+    table.column({
+      accessor: "averagePrice",
+      header: "Average Price",
+      cell: ({ value }) => formatNumber(value)
+    }),
+    table.column({
+      accessor: "auctionCount",
+      header: "Auctions"
     }),
     table.column({
       id: "actions",
@@ -173,22 +187,22 @@
                         <Render of={cell.render()} />
                         {#if cell.id === "generator"}
                           {#if props.sort.order === "desc"}
-                            <ArrowDownAZ class="ml-2 h-4 w-4" />
+                            <ArrowDownZA class="ml-2 h-4 w-4" />
                           {:else if props.sort.order === "asc"}
-                            <ArrowUpAZ class="ml-2 h-4 w-4" />
+                            <ArrowDownAZ class="ml-2 h-4 w-4" />
                           {:else}
-                            <ArrowUpDown class="ml-2 h-4 w-4" />
+                            <Funnel class="ml-2 h-4 w-4" />
                           {/if}
                         {:else if cell.id === "craftCost" || cell.id === "generator_tier"}
                           {#if props.sort.order === "desc"}
-                            <ArrowDown01 class="ml-2 h-4 w-4" />
+                            <ArrowDown10 class="ml-2 h-4 w-4" />
                           {:else if props.sort.order === "asc"}
-                            <ArrowUp01 class="ml-2 h-4 w-4" />
+                            <ArrowDown01 class="ml-2 h-4 w-4" />
                           {:else}
-                            <ArrowUpDown class="ml-2 h-4 w-4" />
+                            <Funnel class="ml-2 h-4 w-4" />
                           {/if}
                         {:else}
-                          <ArrowUpDown class="ml-2 h-4 w-4" />
+                          <Funnel class="ml-2 h-4 w-4" />
                         {/if}
                       </Button>
                     {/if}

@@ -107,7 +107,7 @@
     "tailwind-variants": "^0.2.1"
   },
   "engines": {
-    "node": "^22",
+    "node": "^22 || ^24",
     "pnpm": "^9 || ^10",
     "deno": "forbidden, use node instead",
     "npm": "forbidden, use pnpm instead",
