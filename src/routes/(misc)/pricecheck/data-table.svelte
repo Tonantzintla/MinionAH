@@ -20,7 +20,12 @@
   import DataTableMinion from "./data-table-minion.svelte";
   import DataTableTier from "./data-table-tier.svelte";
 
-  export let data: Minion[];
+  interface MinionWithStats extends Minion {
+    averagePrice: number;
+    auctionCount: number;
+  }
+
+  export let data: MinionWithStats[];
 
   const table = createTable(readable(data), {
     page: addPagination({
@@ -80,6 +85,15 @@
         }
       },
       cell: ({ value }) => formatNumber(value)
+    }),
+    table.column({
+      accessor: "averagePrice",
+      header: "Average Price",
+      cell: ({ value }) => formatNumber(value)
+    }),
+    table.column({
+      accessor: "auctionCount",
+      header: "Auctions"
     }),
     table.column({
       id: "actions",

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Minion } from "$generated/prisma";
   import { OrbitingCircles } from "$lib/components/magicui";
   import * as Avatar from "$lib/components/ui/avatar";
   import SvelteSeo from "svelte-seo";
@@ -6,6 +7,15 @@
   import DataTable from "./data-table.svelte";
 
   export let data: PageData;
+
+  const calculateMinionStats = (minions: Minion[], auctions: { minion_id: string; price: number }[]) => {
+    return minions.map((minion) => {
+      const minionAuctions = auctions.filter((a) => a.minion_id === minion.id);
+      const auctionCount = minionAuctions.length;
+      const averagePrice = auctionCount > 0 ? minionAuctions.reduce((acc, curr) => acc + curr.price, 0) / auctionCount : 0;
+      return { ...minion, auctionCount, averagePrice };
+    });
+  };
 </script>
 
 <SvelteSeo
@@ -88,15 +98,15 @@
   {/await}
 </div>
 <div class="container mx-auto pb-10">
-  {#await data.minions}
+  {#await Promise.all([data.minions, data.auctions])}
     <div class="mt-[4.5rem] divide-y divide-border overflow-hidden rounded-md border border-border bg-background">
       <div class="h-12 w-full animate-pulse bg-muted"></div>
       {#each Array(12) as _, index (index)}
         <div class="h-[4.25rem] w-full animate-pulse bg-muted"></div>
       {/each}
     </div>
-  {:then minions}
-    <DataTable data={minions} />
+  {:then [minions, auctions]}
+    <DataTable data={calculateMinionStats(minions, auctions)} />
     <p class="mx-auto w-fit text-xs text-muted-foreground/50">Are you a developer? Check out the <a href="/api/craftcost/docs" class="underline">API</a></p>
   {:catch}
     <p class="text-destructive-foreground">Something went wrong, try refreshing the page. If the problem persists, please submit a bug report or contact us.</p>
