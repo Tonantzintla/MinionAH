@@ -76,7 +76,7 @@ That's why I thought, "There must surely be a better way to tackle this problem.
 # 🌐 Community
 
 <p align=center>
-   <a href="https://discord.minionah.com">
+   <a href="https://discord.tonantzintla.org">
       <img src="https://discordapp.com/api/guilds/1133219625497284638/widget.png?style=banner3" alt="Discord Server" />
    </a>
 </p>

@@ -4,7 +4,7 @@
 
 The changelogs are no longer being update as it is too much work to keep track of all the changes as a solo developer.
 
-Big releases will be announced on [MinionAH Newsroom](https://newsroom.minionah.com) and on the [MinionAH Discord](https://discord.minionah.com).
+Big releases will be announced on [MinionAH Newsroom](https://newsroom.minionah.com) and on the [MinionAH Discord](https://discord.tonantzintla.org).
 
 ~~All notable changes to this project will be documented in this file.~~
 
