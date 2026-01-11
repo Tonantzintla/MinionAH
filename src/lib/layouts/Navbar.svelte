@@ -51,7 +51,7 @@
               <DropdownMenu.Item target="_blank" class="gap-1.5 transition-colors duration-300 hover:cursor-pointer data-[highlighted]:bg-background" href="https://newsroom.minionah.com">
                 <Newspaper class="size-4" />Newsroom
               </DropdownMenu.Item>
-              <DropdownMenu.Item target="_blank" class="gap-1.5 transition-colors duration-300 hover:cursor-pointer data-[highlighted]:bg-background" href="https://discord.minionah.com">
+              <DropdownMenu.Item target="_blank" class="gap-1.5 transition-colors duration-300 hover:cursor-pointer data-[highlighted]:bg-background" href="https://discord.tonantzintla.org">
                 <Users class="size-4" />Community
               </DropdownMenu.Item>
               <DropdownMenu.Separator class="bg-border" />

@@ -64,7 +64,7 @@
     //       action: {
     //         label: "Join",
     //         onClick: () => {
-    //           window.open("https://discord.minionah.com/", "_blank");
+    //           window.open("https://discord.tonantzintla.org/", "_blank");
     //         }
     //       },
     //       duration: Number.POSITIVE_INFINITY,
@@ -77,7 +77,7 @@
     //             closeButton: "!hidden"
     //           },
     //           componentProps: {
-    //             htmlMessage: "You can always join our Discord server by visiting <a href='https://discord.minionah.com/' target='_blank' class='underline'>discord.minionah.com</a>"
+    //             htmlMessage: "You can always join our Discord server by visiting <a href='https://discord.tonantzintla.org/' target='_blank' class='underline'>discord.tonantzintla.org</a>"
     //           }
     //         });
     //       }

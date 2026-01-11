@@ -333,7 +333,7 @@
                         </ul>
 
                         <div class="mt-4 flex gap-4">
-                          <Button href="https://discord.minionah.com" target="_blank" rel="noopener noreferrer" variant="default">Join Server</Button>
+                          <Button href="https://discord.tonantzintla.org" target="_blank" rel="noopener noreferrer" variant="default">Join Server</Button>
                           <Button href="https://discord.com/oauth2/authorize?client_id=1276266745463705601" target="_blank" rel="noopener noreferrer" variant="default">Add App</Button>
                         </div>
 
