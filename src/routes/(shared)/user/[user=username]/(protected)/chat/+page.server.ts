@@ -1,10 +1,8 @@
-import { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET, SOCKUDO_APP_ID, SOCKUDO_SECRET } from "$env/static/private";
-import { PUBLIC_SOCKUDO_HOST, PUBLIC_SOCKUDO_KEY } from "$env/static/public";
+import { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET } from "$env/static/private";
 import { sanitize } from "@jill64/universal-sanitizer";
 import { error, fail, redirect } from "@sveltejs/kit";
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getMessaging, type MulticastMessage } from "firebase-admin/messaging";
-import Pusher from "pusher";
 import type { PageServerLoad } from "./$types";
 import { MessageType, type iMessage } from "./+page.svelte";
 
@@ -252,72 +250,51 @@ export const actions = {
 
       const messaging = getMessaging(firebaseApp);
 
-      const pusher = new Pusher({
-        appId: SOCKUDO_APP_ID,
-        key: PUBLIC_SOCKUDO_KEY,
-        secret: SOCKUDO_SECRET,
-        host: PUBLIC_SOCKUDO_HOST,
-        port: "443",
-        useTLS: true
-      });
-
-      await pusher
-        .trigger(`chat-${chat.id}`, "new-message", {
-          chat_id: chat.id,
-          user_id: user.id,
-          content: messageJSON.content,
-          createdAt: messageJSON.createdAt,
-          id: messageJSON.id,
-          type: messageType
-        })
-        .then(async (res) => {
-          if (res.status === 200) {
-            await Promise.all([
-              prisma.message.create({
-                data: {
-                  chat_id: chat!.id,
-                  content: messageJSON.content,
-                  user_id: user.id,
-                  type: messageType
-                }
-              }),
-              prisma.chat.update({
-                where: {
-                  id: chat!.id
-                },
-                data: {
-                  user1Read: user.id === chat!.user1_id ? chat!.user1Read : false,
-                  user2Read: user.id === chat!.user2_id ? chat!.user2Read : false
-                }
-              })
-            ]);
-          }
-        })
-        .catch((err) => {
-          console.error(err);
-          switch (err.statusCode) {
-            case 400:
-              return fail(err.body, {
-                status: 400,
-                statusText: "Bad Request"
-              });
-            case 401:
-              return fail(err.body, {
-                status: 401,
-                statusText: "Unauthorized"
-              });
-            case 403:
-              return fail(err.body, {
-                status: 403,
-                statusText: "Forbidden"
-              });
-            default:
-              return fail(err.body, {
-                status: 500,
-                statusText: "Internal Server Error"
-              });
-          }
-        });
+      try {
+        await Promise.all([
+          prisma.message.create({
+            data: {
+              chat_id: chat!.id,
+              content: messageJSON.content,
+              user_id: user.id,
+              type: messageType
+            }
+          }),
+          prisma.chat.update({
+            where: {
+              id: chat!.id
+            },
+            data: {
+              user1Read: user.id === chat!.user1_id ? chat!.user1Read : false,
+              user2Read: user.id === chat!.user2_id ? chat!.user2Read : false
+            }
+          })
+        ]);
+      } catch (err: any) {
+        console.error(err);
+        switch (err.statusCode) {
+          case 400:
+            return fail(err.body, {
+              status: 400,
+              statusText: "Bad Request"
+            });
+          case 401:
+            return fail(err.body, {
+              status: 401,
+              statusText: "Unauthorized"
+            });
+          case 403:
+            return fail(err.body, {
+              status: 403,
+              statusText: "Forbidden"
+            });
+          default:
+            return fail(err.body, {
+              status: 500,
+              statusText: "Internal Server Error"
+            });
+        }
+      }
 
       // get the notification settings of the other user
       const notificationSettings =
