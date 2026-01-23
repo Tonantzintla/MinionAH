@@ -18,7 +18,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { beforeNavigate, goto } from "$app/navigation";
-  import { PUBLIC_SOCKUDO_HOST, PUBLIC_SOCKUDO_KEY, PUBLIC_SOCKUDO_USE_TLS } from "$env/static/public";
   import { MinionCard } from "$lib/components/card";
   import Tiptap from "$lib/components/chat/Tiptap.svelte";
   import ChatLoading from "$lib/components/chat/chat-loading.svelte";
@@ -30,7 +29,6 @@
   import { scrollToBottomAction } from "$lib/utilities";
   import CircleArrowLeft from "lucide-svelte/icons/circle-arrow-left";
   import MessageSquarePlus from "lucide-svelte/icons/message-square-plus";
-  import Pusher from "pusher-js";
   import { onMount } from "svelte";
   import { derived, writable } from "svelte/store";
   import { draw, fade } from "svelte/transition";
@@ -39,19 +37,6 @@
   export let data: PageData;
 
   const chatExists = data.chat !== null;
-  const pusher = chatExists
-    ? new Pusher(PUBLIC_SOCKUDO_KEY, {
-        wsHost: PUBLIC_SOCKUDO_HOST,
-        wsPort: 80,
-        wssPort: 443,
-        forceTLS: PUBLIC_SOCKUDO_USE_TLS === "true",
-        disableStats: true, // Recommended for self-hosted solutions
-        enabledTransports: ["ws", "wss"], // Ensure 'ws' and 'wss' are enabled
-        cluster: ""
-      })
-    : null;
-
-  const channel = chatExists && pusher ? pusher.subscribe(`chat-${data.chat?.id}`) : null;
 
   const showChat = data.chat !== null;
   const message = writable<iMessage>();
@@ -97,13 +82,7 @@
   };
 
   const disconnect = () => {
-    if (!chatExists || !pusher || !channel) return;
-    channel.unsubscribe();
-    channel.unbind_all();
-    channel.disconnect();
-    pusher.unsubscribe(data.chat!.id);
-    pusher.unbind_all();
-    pusher.disconnect();
+    if (!chatExists) return;
     updateRead(false);
   };
 
@@ -133,34 +112,17 @@
   };
 
   onMount(async () => {
-    if (!chatExists || !pusher || !channel) return;
+    if (!chatExists) return;
 
     if (data.messages) messages.set([...$messages, ...(data.messages as unknown as iMessage[])]);
 
     updateRead(true);
 
-    channel.bind("new-message", (new_message: iMessage) => {
-      sentMessageSuccess.set(null);
-      new_message.createdAt = new Date(new_message.createdAt);
-      new_message.animate = true;
-      if (new_message.user_id === data.user.id) {
-        messages.set([...$messages, new_message]);
-        newChats.set($newChats.filter((message) => message.id !== new_message.id));
-        sentMessageSuccess.set(true);
-        clearTimeout($timeout);
-        timeout.set(
-          setTimeout(() => {
-            sentMessageSuccess.set(null);
-          }, 1000)
-        );
-      } else {
-        messages.set([...$messages, new_message]);
-      }
-    });
+
   });
 
   beforeNavigate(async ({ to, type, cancel }) => {
-    if (!chatExists || !pusher || !channel) return;
+    if (!chatExists) return;
     disconnect();
     if (type === "link") {
       cancel();
@@ -229,6 +191,12 @@
                     sentMessageSuccess.set(null);
                   }, 1000)
                 );
+                // Remove the message from newChats and add to messages
+                const sentMessage = $newChats.find((m) => m.id === $message.id);
+                if (sentMessage) {
+                  newChats.set($newChats.filter((m) => m.id !== $message.id));
+                  messages.set([...$messages, { ...sentMessage, animate: false }]);
+                }
               } else if (result.type === "error") {
                 sentMessageSuccess.set(false);
                 clearTimeout($timeout);
@@ -283,6 +251,12 @@
                       sentMessageSuccess.set(null);
                     }, 1000)
                   );
+                  // Remove the message from newChats and add to messages
+                  const sentMessage = $newChats.find((m) => m.id === $message.id);
+                  if (sentMessage) {
+                    newChats.set($newChats.filter((m) => m.id !== $message.id));
+                    messages.set([...$messages, { ...sentMessage, animate: false }]);
+                  }
                 } else if (result.type === "error") {
                   sentMessageSuccess.set(false);
                   clearTimeout($timeout);
