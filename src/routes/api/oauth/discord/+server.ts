@@ -1,7 +1,9 @@
 import { dev } from "$app/environment";
-import { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { redirect, type RequestHandler } from "@sveltejs/kit";
 import { Discord, generateCodeVerifier, generateState } from "arctic";
+
+const { DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_REDIRECT_URI } = envPrivate;
 
 const discord = new Discord(DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, dev ? "http://localhost:5173/api/oauth/discord/callback" : DISCORD_REDIRECT_URI);
 

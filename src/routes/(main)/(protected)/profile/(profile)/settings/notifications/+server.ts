@@ -1,8 +1,10 @@
-import { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import type { Message } from "firebase-admin/messaging";
 import { getMessaging } from "firebase-admin/messaging";
 import type { RequestHandler } from "./$types";
+
+const { DISCORD_BOT_API_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID } = envPrivate;
 
 export const POST: RequestHandler = async ({ locals, fetch, request }) => {
   const { type, fcmToken }: { type: "DISCORD" | "DEVICE"; fcmToken: string } = await request.json();

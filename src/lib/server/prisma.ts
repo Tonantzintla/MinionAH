@@ -1,5 +1,7 @@
-import { DATABASE_URL } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { PrismaClient } from "$generated/prisma";
+
+const { DATABASE_URL } = envPrivate;
 
 declare global {
   // eslint-disable-next-line no-var

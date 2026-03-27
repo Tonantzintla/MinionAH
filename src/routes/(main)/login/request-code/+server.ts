@@ -1,7 +1,9 @@
-import { MC_ID_API_KEY } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { getMinecraftUserByUsername, type MinecraftUsernameProfile } from "$lib/server/minecraft";
 import { error, json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
+
+const { MC_ID_API_KEY } = envPrivate;
 
 export const POST: RequestHandler = async ({ request }) => {
   const { username } = (await request.json()) as {

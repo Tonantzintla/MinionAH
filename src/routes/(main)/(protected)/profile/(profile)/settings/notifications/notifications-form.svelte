@@ -17,7 +17,7 @@
 
 <script lang="ts">
   import { page } from "$app/stores";
-  import { PUBLIC_VAPID_KEY } from "$env/static/public";
+  import { env as envPublic } from "$env/dynamic/public";
   import * as Alert from "$lib/components/ui/alert";
   import { Button } from "$lib/components/ui/button";
   import { Checkbox } from "$lib/components/ui/checkbox";
@@ -37,6 +37,8 @@
   import { readable, writable } from "svelte/store";
   import { superForm, type Infer, type SuperValidated } from "sveltekit-superforms";
   import { zodClient } from "sveltekit-superforms/adapters";
+
+  const { PUBLIC_VAPID_KEY } = envPublic;
 
   export let data: SuperValidated<Infer<NotificationFormSchema>>;
 

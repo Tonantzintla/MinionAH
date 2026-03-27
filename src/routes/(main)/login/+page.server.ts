@@ -1,4 +1,4 @@
-import { MC_ID_API_KEY } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { createSession, generateSessionToken } from "$lib/server/lucia/auth";
 import { setSessionTokenCookie } from "$lib/server/lucia/cookies";
 import { getMinecraftInfo, getMinecraftUserByUsername, normalizeMinecraftUuid } from "$lib/server/minecraft";
@@ -10,6 +10,8 @@ import { message, superValidate } from "sveltekit-superforms";
 import { zod } from "sveltekit-superforms/adapters";
 import type { Actions, PageServerLoad } from "./$types";
 import { loginFormSchema, mcLoginFormSchema, signupFormSchema } from "./schema";
+
+const { MC_ID_API_KEY } = envPrivate;
 
 const hashOptions = {
   // recommended minimum parameters
