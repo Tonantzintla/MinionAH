@@ -47,7 +47,7 @@ As shown, it's easy to find minions on MinionAH. But it gets even better, when y
 
 ## 👤 Profile
 
-After signing up with [mc-auth](https://mc-auth.com), you can access your profile page where you can create a new minion listing, see a list of your minions, and delete minions you sold or no longer want to sell.
+After signing up with [MC-ID](https://mc-id.com), you can access your profile page where you can create a new minion listing, see a list of your minions, and delete minions you sold or no longer want to sell.
 
 ![Profile](/static/assets/images/readme/profile.png)
 

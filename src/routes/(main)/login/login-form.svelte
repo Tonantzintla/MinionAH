@@ -60,7 +60,7 @@
           setTimeout(() => toast.dismiss($toastLoading), 300);
         },
         onUpdate: async ({ result }) => {
-          if (result.type === "success") {
+          if (result?.type === "success") {
             toast.success("Logged in successfully!");
           } else {
             toast.error("Failed to login.");
@@ -104,8 +104,8 @@
 
       <span class="my-2 w-full text-center text-sm opacity-50">Or</span>
       <Button variant="outline" data-disabled={$submitting} data-sveltekit-preload-data="tap" class="data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50" on:click={handleMcLoginButtonClick}>
-        <img src="/assets/images/mc-auth.svg" class="pointer-events-none mr-1 h-6 w-auto select-none transition-opacity duration-300 group-hover:opacity-70" alt="Mc-Auth" />
-        Login with MC-Auth
+        <img src="/assets/images/MC-ID.svg" class="pointer-events-none mr-1 h-6 w-auto select-none transition-opacity duration-300 group-hover:opacity-70" alt="MC-ID" />
+        Login with MC-ID
       </Button>
     </form>
   </Card.Content>

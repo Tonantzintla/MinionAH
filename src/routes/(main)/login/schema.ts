@@ -7,8 +7,8 @@ const username = z
   // minecraft username regex is /^[a-zA-Z0-9_]{3,16}$/
   .regex(/^[a-zA-Z0-9_]{3,16}$/, "Username must be 3-16 characters and only contain letters, numbers, and underscores");
 
-const code = z.string().refine((x) => /^[A-Z]\d{6}$/.test(x), {
-  message: "Code must start with a capital letter followed by exactly 6 digits (e.g. A123456)"
+const code = z.string().regex(/^\d{6}$/, {
+  message: "Code must contain exactly 6 digits (e.g. 123456)"
 });
 
 export const loginFormSchema = z.object({

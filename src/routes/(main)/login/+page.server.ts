@@ -1,8 +1,7 @@
-import { dev } from "$app/environment";
-import { MC_AUTH_CLIENT_ID, MC_AUTH_CLIENT_SECRET, MC_AUTH_REDIRECT_URI } from "$env/static/private";
+import { MC_ID_API_KEY } from "$env/static/private";
 import { createSession, generateSessionToken } from "$lib/server/lucia/auth";
 import { setSessionTokenCookie } from "$lib/server/lucia/cookies";
-import { parseMinecraftProfile } from "$lib/server/minecraft";
+import { getMinecraftInfo, getMinecraftUserByUsername, normalizeMinecraftUuid } from "$lib/server/minecraft";
 import { getMcAuthUser } from "$lib/server/signup";
 import { hash, verify, type Options } from "@node-rs/argon2";
 import { fail, redirect } from "@sveltejs/kit";
@@ -20,47 +19,59 @@ const hashOptions = {
   parallelism: 1
 } satisfies Options;
 
-async function mcAuthLogin(code: string, username: string) {
-  let mc_id: string;
+type McIdVerifyResponse = {
+  userId: string;
+  username: string;
+};
 
-  try {
-    const response = await fetch(`https://api.mojang.com/users/profiles/minecraft/${username}`);
-    if (!response.ok) {
-      throw new Error(`Mojang API returned ${response.status}`);
-    }
-    const data = await response.json();
-    mc_id = data.id;
-  } catch (e) {
-    console.warn("Mojang API failed, trying fallback API:", e);
-    try {
-      const response = await fetch(`https://api.minecraftservices.com/minecraft/profile/lookup/name/${username.toLowerCase()}`);
-      if (!response.ok) {
-        throw new Error(`Microsoft API returned ${response.status}`);
-      }
-      const data = await response.json();
-      mc_id = data.id;
-    } catch (e) {
-      console.error("Failed to get Minecraft ID for user", username, e);
-      throw new Error("Failed to get Minecraft ID");
-    }
-  }
-
-  const response = await fetch("https://mc-auth.com/oAuth2/alternate-code-exchange", {
+async function verifyMcIdCode(code: string, uuid: string): Promise<McIdVerifyResponse> {
+  const response = await fetch("https://mc-id.com/api/v1/codes/verify", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "X-API-Key": MC_ID_API_KEY
     },
     body: JSON.stringify({
-      client_id: MC_AUTH_CLIENT_ID,
-      client_secret: MC_AUTH_CLIENT_SECRET,
-      code,
-      redirect_uri: dev ? "http://localhost:5173/api/oauth/minecraft" : MC_AUTH_REDIRECT_URI,
-      grant_type: "authorization_code",
-      mc_id
+      uuid,
+      code
     })
   });
 
-  const minecraftUser = await parseMinecraftProfile(response);
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => null);
+    console.error(`Failed to verify MC-ID code for UUID ${uuid}:`, errorData);
+    throw new Error("Failed to verify code");
+  }
+
+  const data = (await response.json()) as Partial<McIdVerifyResponse>;
+  if (!data.userId || !data.username) {
+    throw new Error("Invalid MC-ID verification response");
+  }
+
+  return {
+    userId: normalizeMinecraftUuid(data.userId),
+    username: data.username
+  };
+}
+
+async function mcIdHeadlessLogin(code: string, username: string) {
+  let mcUserId: string;
+
+  try {
+    const user = await getMinecraftUserByUsername(username);
+    mcUserId = user.id;
+  } catch (e) {
+    console.error("Failed to get Minecraft ID for username", username, e);
+    throw new Error("Failed to get Minecraft ID");
+  }
+
+  const verification = await verifyMcIdCode(code, mcUserId);
+
+  if (verification.userId !== mcUserId) {
+    throw new Error("Verification result did not match the requested user");
+  }
+
+  const minecraftUser = await getMinecraftInfo(verification.userId);
 
   const user = await getMcAuthUser(minecraftUser);
   return user;
@@ -172,7 +183,7 @@ export const actions: Actions = {
     }
 
     try {
-      const user = await mcAuthLogin(form.data.logincode, form.data.mcloginusername);
+      const user = await mcIdHeadlessLogin(form.data.logincode, form.data.mcloginusername);
 
       const token = generateSessionToken();
       const session = await createSession(token, user.id);
@@ -191,7 +202,7 @@ export const actions: Actions = {
     if (!form.valid) return fail(400, { form });
 
     try {
-      const user = await mcAuthLogin(form.data.code, form.data.mcusername);
+      const user = await mcIdHeadlessLogin(form.data.code, form.data.mcusername);
 
       const token = generateSessionToken();
       const session = await createSession(token, user.id);
