@@ -12,7 +12,7 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "update:shadcn": "pnpm dlx shadcn-svelte@latest update -a && prettier --write ./src/lib/components/ui && prettier --write ./src/lib/utils.ts",
-    "postinstall": "svelte-kit sync && prisma generate",
+    "postinstall": "pnpm run prepare && prisma generate",
     "prisma:generate:dev": "dotenv -e .env.development -- prisma generate",
     "prisma:generate": "prisma generate",
     "prisma:db:push:dev": "dotenv -e .env.development -- prisma db push",
