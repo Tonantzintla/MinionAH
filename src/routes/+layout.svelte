@@ -2,7 +2,7 @@
   import { browser, dev } from "$app/environment";
   import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
   import { page } from "$app/stores";
-  import { PUBLIC_POSTHOG_KEY, PUBLIC_VAPID_KEY } from "$env/static/public";
+  import { env as envPublic } from "$env/dynamic/public";
   import MessageToast from "$lib/components/MessageToast.svelte";
   import * as Breadcrumb from "$lib/components/ui/breadcrumb";
   import { Toaster } from "$lib/components/ui/sonner";
@@ -22,6 +22,8 @@
   import "../app.css";
   import type { LayoutData } from "./$types";
   import BugReport from "./bug-report.svelte";
+
+  const { PUBLIC_POSTHOG_KEY, PUBLIC_VAPID_KEY } = envPublic;
 
   export let data: LayoutData;
 

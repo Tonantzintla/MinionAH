@@ -117,8 +117,6 @@
     if (data.messages) messages.set([...$messages, ...(data.messages as unknown as iMessage[])]);
 
     updateRead(true);
-
-
   });
 
   beforeNavigate(async ({ to, type, cancel }) => {

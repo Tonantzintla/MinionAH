@@ -1,8 +1,10 @@
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import type { Minion } from "$generated/prisma";
 import { json } from "@sveltejs/kit";
 import { v2 as cloudinary } from "cloudinary";
 import type { RequestHandler } from "./$types";
+
+const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } = envPrivate;
 
 interface MinionWithTexture extends Minion {
   texture?: string;

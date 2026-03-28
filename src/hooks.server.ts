@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
-import { ADMIN_ID, MAINTENANCE_MODE, RATE_LIMIT_SECRET } from "$env/static/private";
-import { PUBLIC_SENTRY_DSN } from "$env/static/public";
+import { env as envPrivate } from "$env/dynamic/private";
+import { env as envPublic } from "$env/dynamic/public";
 import { validateSessionToken } from "$lib/server/lucia/auth";
 import { deleteSessionTokenCookie, setSessionTokenCookie } from "$lib/server/lucia/cookies";
 import { contextLinesIntegration, extraErrorDataIntegration, handleErrorWithSentry, init, sentryHandle } from "@sentry/sveltekit";
@@ -9,6 +9,9 @@ import { redirect, type Reroute } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { RetryAfterRateLimiter } from "sveltekit-rate-limiter/server";
 import { CloudflareIPUARateLimiter } from "sveltekit-rate-limiter/server/limiters";
+
+const { ADMIN_ID, MAINTENANCE_MODE, RATE_LIMIT_SECRET } = envPrivate;
+const { PUBLIC_SENTRY_DSN } = envPublic;
 
 init({
   dsn: PUBLIC_SENTRY_DSN,

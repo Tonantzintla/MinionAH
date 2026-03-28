@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "prettier.prettier-vscode",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always",
@@ -21,7 +21,6 @@
     "typescript": "typescript",
     "svelte": "html"
   },
-  "javascript.updateImportsOnFileMove.enabled": "prompt",
-  "typescript.updateImportsOnFileMove.enabled": "prompt",
+  "js/ts.updateImportsOnFileMove.enabled": "prompt",
   "eslint.validate": ["javascript", "typescript", "svelte"]
 }

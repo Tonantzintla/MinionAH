@@ -1,8 +1,10 @@
-import { CRON_SECRET } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { bulkUpdate, type BulkUpdateEntries } from "$lib/server/utilities";
 import { captureCheckIn } from "@sentry/sveltekit";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
+
+const { CRON_SECRET } = envPrivate;
 
 export const GET: RequestHandler = async ({ request, fetch }) => {
   const checkInId = captureCheckIn({

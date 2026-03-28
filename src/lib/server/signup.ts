@@ -1,8 +1,10 @@
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { v2 as cloudinary } from "cloudinary";
-import type { MCAuthProfile } from "./minecraft";
+import type { MinecraftProfile } from "./minecraft";
 
-export async function getMcAuthUser(minecraftUser: MCAuthProfile) {
+const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } = envPrivate;
+
+export async function getMcAuthUser(minecraftUser: MinecraftProfile) {
   cloudinary.config({
     cloud_name: CLOUDINARY_CLOUD_NAME,
     api_key: CLOUDINARY_API_KEY,

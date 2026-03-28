@@ -2,16 +2,15 @@
   import * as Tabs from "$lib/components/ui/tabs";
   import SvelteSeo from "svelte-seo";
   import { cubicInOut } from "svelte/easing";
-  import { writable } from "svelte/store";
   import { crossfade } from "svelte/transition";
   import type { PageData } from "./$types";
   import LoginForm from "./login-form.svelte";
   import McLoginForm from "./mc-login-form.svelte";
   import SignupForm from "./signup-form.svelte";
 
-  export let data: PageData;
+  let { data }: { data: PageData } = $props();
 
-  const value = writable<"login" | "sign-up" | "mclogin">("login");
+  let value = $state<"login" | "sign-up" | "mclogin">("login");
 
   const tabs = [
     { title: "Login", value: "login" },
@@ -19,15 +18,15 @@
   ];
 
   const handleSignUpButtonClick = () => {
-    value.set("sign-up");
+    value = "sign-up";
   };
 
   const handleSignInButtonClick = () => {
-    value.set("login");
+    value = "login";
   };
 
   const handleMcSignInButtonClick = () => {
-    value.set("mclogin");
+    value = "mclogin";
   };
 
   const [send, receive] = crossfade({
@@ -46,7 +45,7 @@
         name: "How does it work?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "We use MC-Auth to authenticate your Minecraft account, which is the most secure way to do so.<br /><br />No sensitive information like your password, tokens, or any other personal information is being used or stored during this process.<br /><br />For more information, check out <a href='https://mc-auth.com'>MC-Auth</a>."
+          text: "We use MC-ID to authenticate your Minecraft account, which is the most secure way to do so.<br /><br />No sensitive information like your password, tokens, or any other personal information is being used or stored during this process.<br /><br />For more information, check out <a href='https://mc-id.com'>MC-ID</a>."
         }
       },
       {
@@ -54,7 +53,7 @@
         name: "Can I trust you with my account?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "We will never try to steal, sell, or otherwise misuse your Minecraft account information. We use the information provided by MC-Auth to verify your Minecraft identity.<br /><br />We will also never ask for your Minecraft password or any other sensitive information."
+          text: "We will never try to steal, sell, or otherwise misuse your Minecraft account information. We use the information provided by MC-ID to verify your Minecraft identity.<br /><br />We will also never ask for your Minecraft password or any other sensitive information."
         }
       },
       {
@@ -76,10 +75,10 @@
     ]
   }} />
 
-<Tabs.Root bind:value={$value} class="mx-auto w-full max-w-md px-4">
+<Tabs.Root bind:value class="mx-auto w-full max-w-md px-4">
   <Tabs.List class="grid w-full grid-cols-2 gap-4">
-    {#each tabs as tab}
-      {@const isActive = $value === tab.value || ($value === "mclogin" && tab.value === "login")}
+    {#each tabs as tab (tab.value)}
+      {@const isActive = value === tab.value || (value === "mclogin" && tab.value === "login")}
       <Tabs.Trigger value={tab.value} class="relative data-[state=active]:bg-transparent" data-sveltekit-noscroll data-state={isActive ? "active" : "inactive"}>
         {#if isActive}
           <div class="absolute inset-0 rounded-md bg-accent" in:send={{ key: "active-tab" }} out:receive={{ key: "active-tab" }}></div>

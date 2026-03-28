@@ -1,8 +1,10 @@
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME, DISCORD_API_ENDPOINT, DISCORD_BOT_TOKEN } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { updateDiscordAvatar } from "$lib/server/discord";
 import { error, json, redirect } from "@sveltejs/kit";
 import { v2 as cloudinary } from "cloudinary";
 import type { RequestHandler } from "./$types";
+
+const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME, DISCORD_API_ENDPOINT, DISCORD_BOT_TOKEN } = envPrivate;
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,

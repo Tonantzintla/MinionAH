@@ -1,6 +1,8 @@
-import { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { error } from "@sveltejs/kit";
 import { v2 as cloudinary } from "cloudinary";
+
+const { CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET, CLOUDINARY_CLOUD_NAME } = envPrivate;
 
 cloudinary.config({
   cloud_name: CLOUDINARY_CLOUD_NAME,

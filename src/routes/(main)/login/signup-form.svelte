@@ -29,10 +29,39 @@
   const { form: formData, enhance, tainted, isTainted, submitting, timeout, errors } = form;
 
   const toastLoading = writable<number | string>();
+  const step = writable<"1" | "2">("1");
+  const requestingCode = writable(false);
 
   const handleSignInButtonClick = () => {
     dispatch("signin");
   };
+
+  async function requestCode() {
+    requestingCode.set(true);
+    try {
+      const response = await fetch("/login/request-code", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          username: $formData.mcusername
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to request code");
+      }
+
+      toast.success("Code requested successfully! Check your Minecraft chat for the code.");
+      step.set("2");
+    } catch (error) {
+      console.error("Error requesting code:", error);
+      toast.error("Failed to request code. Please try again.");
+    } finally {
+      requestingCode.set(false);
+    }
+  }
 
   timeout.subscribe((value) => {
     if (value) {
@@ -60,7 +89,7 @@
           setTimeout(() => toast.dismiss($toastLoading), 300);
         },
         onUpdate: async ({ result }) => {
-          if (result.type === "success") {
+          if (result?.type === "success") {
             toast.success("Signed you up successfully!");
           } else {
             toast.error("Failed to sign you up.");
@@ -71,45 +100,56 @@
         }
       }}
       class="relative mx-auto flex h-1/2 max-w-md flex-col justify-center self-center px-4 md:px-0">
-      <Form.Field {form} name="mcusername">
-        <Form.Control let:attrs>
-          <Form.Label for="mcusername">Username</Form.Label>
-          <Form.Description>This is your <span class="font-semibold">Minecraft</span> username.</Form.Description>
-          <Input {...attrs} bind:value={$formData.mcusername} maxlength={16} type="text" class="border-2 border-accent transition-all duration-300 focus:border-muted-foreground focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 data-[invalid]:border-destructive/40 focus:data-[invalid]:border-destructive" autocomplete="username" name="mcusername" id="mcusername" />
-          <div class="text-sm font-medium text-destructive">
-            {#if $errors.mcusername?.length}
-              <div>{$errors.mcusername[0]}</div>
-            {/if}
-          </div>
-        </Form.Control>
-      </Form.Field>
-      <Form.Field {form} name="code">
-        <Form.Control let:attrs>
-          <Form.Label for="code">Code</Form.Label>
-          <Form.Description
-            >Start Minecraft and connect to
-            <Tooltip.Root>
-              <Tooltip.Trigger
-                class="inline"
-                on:pointerdown={() => {
-                  navigator.clipboard.writeText("alt.mc-auth.com");
-                  toast.success("Copied the server address to your clipboard.");
-                }}><span class="text-foreground">alt.mc-auth.com</span>.</Tooltip.Trigger>
-              <Tooltip.Content class="border-border bg-popover">
-                <p>Click to copy</p>
-              </Tooltip.Content>
-            </Tooltip.Root>You'll get kicked from the server and provided with an code</Form.Description>
-          <Input {...attrs} bind:value={$formData.code} maxlength={16} type="text" class="border-2 border-accent transition-all duration-300 focus:border-muted-foreground focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 data-[invalid]:border-destructive/40 focus:data-[invalid]:border-destructive" name="code" id="code" on:keydown={(e) => e.code === "Space" && e.preventDefault()} />
-          <Form.FieldErrors />
-        </Form.Control>
-      </Form.Field>
-      <Form.Button disabled={!isTainted($tainted) || $submitting} class="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-all duration-300 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-        {#if !$submitting}
-          Sign up
-        {:else}
-          <LoaderCircle class="h-4 w-4 animate-spin" />
-        {/if}
-      </Form.Button>
+      {#if $step === "1"}
+        <Form.Field {form} name="mcusername">
+          <Form.Control let:attrs>
+            <Form.Label for="mcusername">Username</Form.Label>
+            <Form.Description>This is your <span class="font-semibold">Minecraft</span> username.</Form.Description>
+            <Input {...attrs} bind:value={$formData.mcusername} maxlength={16} type="text" class="border-2 border-accent transition-all duration-300 focus:border-muted-foreground focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 data-[invalid]:border-destructive/40 focus:data-[invalid]:border-destructive" autocomplete="username" name="mcusername" id="mcusername" />
+            <div class="text-sm font-medium text-destructive">
+              {#if $errors.mcusername?.length}
+                <div>{$errors.mcusername[0]}</div>
+              {/if}
+            </div>
+          </Form.Control>
+        </Form.Field>
+        <Button type="button" disabled={!isTainted($tainted) || $submitting || $requestingCode} class="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-all duration-300 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50" on:click={requestCode}>
+          {#if !$submitting && !$requestingCode}
+            Request code
+          {:else}
+            <LoaderCircle class="h-4 w-4 animate-spin" />
+          {/if}
+        </Button>
+      {/if}
+      {#if $step === "2"}
+        <Form.Field {form} name="code">
+          <Form.Control let:attrs>
+            <Form.Label for="code">Code</Form.Label>
+            <Form.Description
+              >Start Minecraft and connect to
+              <Tooltip.Root>
+                <Tooltip.Trigger
+                  class="inline"
+                  on:pointerdown={() => {
+                    navigator.clipboard.writeText("auth.mc-id.com");
+                    toast.success("Copied the server address to your clipboard.");
+                  }}><span class="text-foreground">auth.mc-id.com</span>.</Tooltip.Trigger>
+                <Tooltip.Content class="border-border bg-popover">
+                  <p>Click to copy</p>
+                </Tooltip.Content>
+              </Tooltip.Root>You'll get kicked from the server and provided with a code</Form.Description>
+            <Input {...attrs} bind:value={$formData.code} maxlength={16} type="text" class="border-2 border-accent transition-all duration-300 focus:border-muted-foreground focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 data-[invalid]:border-destructive/40 focus:data-[invalid]:border-destructive" name="code" id="code" on:keydown={(e) => e.code === "Space" && e.preventDefault()} />
+            <Form.FieldErrors />
+          </Form.Control>
+        </Form.Field>
+        <Form.Button disabled={!isTainted($tainted) || $submitting} class="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-all duration-300 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
+          {#if !$submitting}
+            Sign up
+          {:else}
+            <LoaderCircle class="h-4 w-4 animate-spin" />
+          {/if}
+        </Form.Button>
+      {/if}
     </form>
   </Card.Content>
   <Card.Footer>
@@ -129,19 +169,19 @@
       <Accordion.Item value="item-1" class="border-border">
         <Accordion.Trigger class="text-start text-accent-foreground">How does it work?</Accordion.Trigger>
         <Accordion.Content>
-          We use MC-Auth to authenticate your Minecraft account, which is the most secure way to do so.
+          We use MC-ID to authenticate your Minecraft account, which is the most secure way to do so.
           <br /><br />
           No sensitive information like your password, tokens, or any other personal information is being used or stored during this process.
           <br /><br />
-          For more information, check out <a href="https://mc-auth.com" target="_blank" rel="noopener" class="text-accent-foreground underline">MC-Auth</a>.
+          For more information, check out <a href="https://docs.mc-id.com" target="_blank" rel="noopener" class="text-accent-foreground underline">MC-ID</a>.
         </Accordion.Content>
       </Accordion.Item>
       <Accordion.Item value="item-2" class="border-border">
         <Accordion.Trigger class="text-start text-accent-foreground">Can I trust you with my account?</Accordion.Trigger>
         <Accordion.Content>
-          We can't make any changes, purchases, or do anything else with your Minecraft account, because we simply do not get any data that would allow us to do so from MC-Auth.
+          We can't make any changes, purchases, or do anything else with your Minecraft account, because we simply do not get any data that would allow us to do so from MC-ID.
           <br /><br />
-          We will also never attempt to steal, sell, or otherwise misuse your Minecraft account information. We use the information provided by MC-Auth to verify your Minecraft ownership and identity.
+          We will also never attempt to steal, sell, or otherwise misuse your Minecraft account information. We use the information provided by MC-ID to verify your Minecraft ownership and identity.
           <br /><br />
           We will also never ask for your Minecraft or Microsoft password or any other sensitive information.
         </Accordion.Content>

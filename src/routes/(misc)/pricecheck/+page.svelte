@@ -110,11 +110,9 @@
     </div>
   {:then [minions, auctions]}
     <DataTable data={calculateMinionStats(minions, auctions)} />
-    {:catch}
+  {:catch}
     <p class="text-destructive-foreground">Something went wrong, try refreshing the page. If the problem persists, please submit a bug report or contact us.</p>
-    {/await}
-    <p class="mx-auto w-fit text-xs text-muted-foreground/50 mb-4">
-      Auctions with either Free Will or Infusion are not included in the average price.
-    </p>
-    <p class="mx-auto w-fit text-xs text-muted-foreground/50">Are you a developer? Check out the <a href="/api/craftcost/docs" class="underline">API</a></p>
+  {/await}
+  <p class="mx-auto mb-4 w-fit text-xs text-muted-foreground/50">Auctions with either Free Will or Infusion are not included in the average price.</p>
+  <p class="mx-auto w-fit text-xs text-muted-foreground/50">Are you a developer? Check out the <a href="/api/craftcost/docs" class="underline">API</a></p>
 </div>

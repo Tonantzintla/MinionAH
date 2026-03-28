@@ -1,9 +1,11 @@
-import { CRON_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET } from "$env/static/private";
+import { env as envPrivate } from "$env/dynamic/private";
 import { captureCheckIn } from "@sentry/sveltekit";
 import { json } from "@sveltejs/kit";
 import { cert, getApp, getApps, initializeApp } from "firebase-admin/app";
 import { getMessaging, type MulticastMessage } from "firebase-admin/messaging";
 import type { RequestHandler } from "./$types";
+
+const { CRON_SECRET, FIREBASE_SERVICE_CLIENT_EMAIL, FIREBASE_SERVICE_PRIVATE_KEY, FIREBASE_SERVICE_PROJECT_ID, MINIONAH_SECRET } = envPrivate;
 
 export const GET: RequestHandler = async ({ request }) => {
   const checkInId = captureCheckIn({
