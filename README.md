@@ -25,6 +25,7 @@ Looking for the changelog? Check out [CHANGELOG.md](/CHANGELOG.md)!
 - [🌐 Community](#-community)
 - [📜 Credits](#-credits)
 
+- [🚀 Dokploy Production Deploy](#-dokploy-production-deploy)
 - [🔒 Privacy/Data](#-privacydata)
 - [🤝 Contributing](#-contributing)
 - [📝 License](#-license)
@@ -84,6 +85,31 @@ That's why I thought, "There must surely be a better way to tackle this problem.
 # 📜 Credits
 
 [Gigi](https://github.com/DarthGigi) - Main Developer
+
+# 🚀 Dokploy Production Deploy
+
+This repository is prepared for the Dokploy production workflow using prebuilt Docker images.
+
+What is included:
+
+- `Dockerfile` for a production SvelteKit Node build.
+- `.github/workflows/deploy.yml` to build and push images on `main`.
+- `GET /health` endpoint at `src/routes/health/+server.ts` for health checks.
+
+Required GitHub secrets:
+
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
+- `DOCKERHUB_NAMESPACE` (your DockerHub username/org)
+- `DOKPLOY_DEPLOY_HOOK` (optional; webhook URL from Dokploy Deployments tab)
+
+Dokploy setup:
+
+1. Create an Application with `Source Type: Docker`.
+2. Use image `${DOCKERHUB_NAMESPACE}/minionah:latest`.
+3. Set container port to `3000`.
+4. Add your environment variables in Dokploy.
+5. Configure health check to `http://localhost:3000/health`.
 
 # 🔒 Privacy/Data
 
