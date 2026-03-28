@@ -118,11 +118,25 @@ function checkRoutes(event: RequestEvent) {
   }
 
   if (event.locals.user) {
-    if (path !== "/signup/password" && event.locals.user._count.key > 0) {
+    const needsPassword = event.locals.user._count.key > 0;
+    const needsEmail = !event.locals.user.settings?.profileSettings?.email?.trim().length;
+
+    if (path !== "/signup/password" && needsPassword) {
       redirect(302, "/signup/password");
     }
 
-    if (path === "/signup/password" && event.locals.user._count.key === 0) {
+    if (path === "/signup/password" && !needsPassword) {
+      if (needsEmail) {
+        redirect(302, "/signup/email");
+      }
+      redirect(302, "/profile");
+    }
+
+    if (!needsPassword && path !== "/signup/email" && needsEmail) {
+      redirect(302, "/signup/email");
+    }
+
+    if (path === "/signup/email" && !needsEmail) {
       redirect(302, "/profile");
     }
   }

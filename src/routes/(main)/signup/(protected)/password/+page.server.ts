@@ -61,6 +61,6 @@ export const actions: Actions = {
       );
     }
 
-    redirect(302, "/profile");
+    redirect(302, "/signup/email");
   }
 };
