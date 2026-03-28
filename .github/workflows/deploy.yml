@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      DOKPLOY_DEPLOY_HOOK: ${{ secrets.DOKPLOY_DEPLOY_HOOK }}
 
     steps:
       - name: Checkout repository
@@ -39,5 +41,5 @@ jobs:
             ${{ secrets.DOCKERHUB_NAMESPACE }}/minionah:${{ github.sha }}
 
       - name: Trigger Dokploy deployment (optional)
-        if: ${{ secrets.DOKPLOY_DEPLOY_HOOK != '' }}
-        run: curl -fsSL -X POST "${{ secrets.DOKPLOY_DEPLOY_HOOK }}"
+        if: ${{ env.DOKPLOY_DEPLOY_HOOK != '' }}
+        run: curl -fsSL -X POST "$DOKPLOY_DEPLOY_HOOK"
