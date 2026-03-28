@@ -56,6 +56,15 @@ export async function validateSessionToken(token: string): Promise<SessionValida
                 }
               }
             }
+          },
+          settings: {
+            include: {
+              profileSettings: {
+                select: {
+                  email: true
+                }
+              }
+            }
           }
         }
       }
@@ -126,6 +135,11 @@ export type SessionValidationResult =
           chatsAsUser2: number;
           key: number;
         };
+        settings: {
+          profileSettings: {
+            email: string | null;
+          } | null;
+        } | null;
       };
     }
   | { session: null; user: null };

@@ -13,6 +13,11 @@ declare global {
               chatsAsUser2: number;
               key: number;
             };
+            settings: {
+              profileSettings: {
+                email: string | null;
+              } | null;
+            } | null;
           })
         | null;
       session: Session | null;
