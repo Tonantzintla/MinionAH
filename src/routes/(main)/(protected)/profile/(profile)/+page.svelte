@@ -354,7 +354,7 @@
                       <Form.Control let:attrs>
                         <div class="select-none space-y-0.5">
                           <Form.Label>Mithril Infused</Form.Label>
-                          <Form.Description><a href="https://hypixel-skyblock.fandom.com/wiki/Mithril_Infusion" target="_blank" class="underline underline-offset-2">Mithril Infusion</a> is a minion upgrade which <br /> increases a minion's speed by 10% permanently.</Form.Description>
+                          <Form.Description><a href="https://hypixelskyblock.minecraft.wiki/w/Mithril_Infusion" target="_blank" class="underline underline-offset-2">Mithril Infusion</a> is a minion upgrade which <br /> increases a minion's speed by 10% permanently.</Form.Description>
                         </div>
                         <Switch includeInput {...attrs} bind:checked={$formDataCreate.infusion} />
                       </Form.Control>
@@ -365,7 +365,7 @@
                       <Form.Control let:attrs>
                         <div class="select-none space-y-0.5">
                           <Form.Label>Free Will</Form.Label>
-                          <Form.Description><a href="https://hypixel-skyblock.fandom.com/wiki/Free_Will" target="_blank" class="underline underline-offset-2">Free Will</a> is a minion upgrade which <br /> increases a minion's speed by 10% permanently.</Form.Description>
+                          <Form.Description><a href="https://hypixelskyblock.minecraft.wiki/w/Free_Will" target="_blank" class="underline underline-offset-2">Free Will</a> is a minion upgrade which <br /> increases a minion's speed by 10% permanently.</Form.Description>
                         </div>
                         <Switch includeInput {...attrs} bind:checked={$formDataCreate["free-will"]} />
                       </Form.Control>

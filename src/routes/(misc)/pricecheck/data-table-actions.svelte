@@ -17,7 +17,7 @@
   <DropdownMenu.Content class="border-border bg-popover">
     <DropdownMenu.Label>Actions</DropdownMenu.Label>
     {#if minion}
-      <DropdownMenu.Item href={`https://hypixel-skyblock.fandom.com/wiki/${minion.name.replace(/ [IVX]+$/, "").replace(/ /g, "_")}`} target="_blank">View it on the community wiki</DropdownMenu.Item>
+      <DropdownMenu.Item href={`https://hypixelskyblock.minecraft.wiki/w/${minion.name.replace(/ [IVX]+$/, "").replace(/ /g, "_")}`} target="_blank">View it on the community wiki</DropdownMenu.Item>
       <DropdownMenu.Item href={`https://wiki.hypixel.net/${minion.name.replace(/ [IVX]+$/, "").replace(/ /g, "_")}`} target="_blank">View it on the official wiki</DropdownMenu.Item>
     {/if}
   </DropdownMenu.Content>
