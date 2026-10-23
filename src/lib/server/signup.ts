@@ -18,48 +18,27 @@ export async function getMcAuthUser(minecraftUser: MinecraftProfile) {
     }
   });
 
-  const [skinResponse, avatarResponse, capeResponse] = await Promise.all([fetch(minecraftUser.properties[0].value.textures.SKIN.url), fetch(`https://mc-heads.net/head/${minecraftUser.id}`), minecraftUser.properties[0].value.textures.CAPE ? fetch(minecraftUser.properties[0].value.textures.CAPE.url) : null]);
+  const textures = minecraftUser.properties[0].value.textures;
+  const sources: [folder: string, url: string | undefined][] = [
+    ["skins", textures.SKIN?.url.replace(/^http:/, "https:")],
+    ["avatars", `https://mc-heads.net/head/${minecraftUser.id}`],
+    ["capes", textures.CAPE?.url.replace(/^http:/, "https:")]
+  ];
 
-  const [skinBuffer, avatarBuffer, capeBuffer] = await Promise.all([skinResponse.arrayBuffer(), avatarResponse.arrayBuffer(), capeResponse ? capeResponse.arrayBuffer() : null]);
-
-  const cloudinaryRequests: Promise<unknown>[] = [];
-
-  const skin = Buffer.from(skinBuffer).toString("base64");
-  cloudinaryRequests.push(
-    cloudinary.uploader.upload(`data:image/png;base64,${skin}`, {
-      folder: `users/skins`,
-      public_id: minecraftUser.id,
-      overwrite: true,
-      resource_type: "image"
+  // Image refresh must never block login: a bad upstream response (e.g. an HTML block page) is logged and skipped.
+  await Promise.all(
+    sources.map(async ([folder, url]) => {
+      if (!url) return;
+      try {
+        const res = await fetch(url);
+        if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) throw new Error(`${res.status} ${res.headers.get("content-type")}`);
+        const base64 = Buffer.from(await res.arrayBuffer()).toString("base64");
+        await cloudinary.uploader.upload(`data:image/png;base64,${base64}`, { folder: `users/${folder}`, public_id: minecraftUser.id, overwrite: true, resource_type: "image" });
+      } catch (e) {
+        console.error(`Failed to update ${folder} image for ${minecraftUser.id} from ${url}:`, e);
+      }
     })
   );
-
-  const avatar = Buffer.from(avatarBuffer).toString("base64");
-  cloudinaryRequests.push(
-    cloudinary.uploader.upload(`data:image/png;base64,${avatar}`, {
-      folder: `users/avatars`,
-      public_id: minecraftUser.id,
-      overwrite: true,
-      resource_type: "image"
-    })
-  );
-
-  let cape: string | null;
-  if (capeBuffer) {
-    cape = Buffer.from(capeBuffer).toString("base64");
-    cloudinaryRequests.push(
-      cloudinary.uploader.upload(`data:image/png;base64,${cape}`, {
-        folder: `users/capes`,
-        public_id: minecraftUser.id,
-        overwrite: true,
-        resource_type: "image"
-      })
-    );
-  } else {
-    cape = null;
-  }
-
-  await Promise.all(cloudinaryRequests);
 
   if (existingUser) {
     // update user
