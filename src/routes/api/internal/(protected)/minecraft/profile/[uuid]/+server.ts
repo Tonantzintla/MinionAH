@@ -54,9 +54,9 @@ export const PATCH: RequestHandler = async ({ params, locals }) => {
   }
 
   try {
-    const response = await fetch(`https://mc-heads.net/head/${profile.id}`);
-    const avatarBuffer = await response.arrayBuffer();
-    const avatar = Buffer.from(avatarBuffer).toString("base64");
+    const response = await fetch(`https://nmsr.nickac.dev/headiso/${profile.id}`);
+    if (!response.ok || !response.headers.get("content-type")?.startsWith("image/")) throw new Error(`NMSR avatar failed: ${response.status}`);
+    const avatar = Buffer.from(await response.arrayBuffer()).toString("base64");
     await cloudinary.uploader.upload(`data:image/png;base64,${avatar}`, {
       folder: `users/avatars`,
       public_id: profile.id,

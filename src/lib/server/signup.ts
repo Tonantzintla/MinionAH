@@ -19,26 +19,28 @@ export async function getMcAuthUser(minecraftUser: MinecraftProfile) {
   });
 
   const textures = minecraftUser.properties[0].value.textures;
-  const sources: [folder: string, url: string | undefined][] = [
-    ["skins", textures.SKIN?.url.replace(/^http:/, "https:")],
-    ["avatars", `https://mc-heads.net/head/${minecraftUser.id}`],
-    ["capes", textures.CAPE?.url.replace(/^http:/, "https:")]
-  ];
+  const id = minecraftUser.id;
 
-  // Image refresh must never block login: a bad upstream response (e.g. an HTML block page) is logged and skipped.
-  await Promise.all(
-    sources.map(async ([folder, url]) => {
-      if (!url) return;
-      try {
-        const res = await fetch(url);
-        if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) throw new Error(`${res.status} ${res.headers.get("content-type")}`);
-        const base64 = Buffer.from(await res.arrayBuffer()).toString("base64");
-        await cloudinary.uploader.upload(`data:image/png;base64,${base64}`, { folder: `users/${folder}`, public_id: minecraftUser.id, overwrite: true, resource_type: "image" });
-      } catch (e) {
-        console.error(`Failed to update ${folder} image for ${minecraftUser.id} from ${url}:`, e);
-      }
-    })
-  );
+  // Image refresh must never block login: failures are logged and skipped.
+  const fetchImage = async (url: string) => {
+    const res = await fetch(url.replace(/^http:/, "https:"), { signal: AbortSignal.timeout(5000) });
+    if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) throw new Error(`${res.status} ${res.headers.get("content-type")} from ${url}`);
+    return Buffer.from(await res.arrayBuffer());
+  };
+  const upload = (folder: string, image: Buffer) => cloudinary.uploader.upload(`data:image/png;base64,${image.toString("base64")}`, { folder: `users/${folder}`, public_id: id, overwrite: true, resource_type: "image" });
+
+  await Promise.all([
+    fetchImage(textures.SKIN.url)
+      .then((skin) => upload("skins", skin))
+      .catch((e) => console.error(`Failed to update skin image for ${id}:`, e)),
+    fetchImage(`https://nmsr.nickac.dev/headiso/${id}`)
+      .then((avatar) => upload("avatars", avatar))
+      .catch((e) => console.error(`Failed to update avatar image for ${id}:`, e)),
+    textures.CAPE &&
+      fetchImage(textures.CAPE.url)
+        .then((cape) => upload("capes", cape))
+        .catch((e) => console.error(`Failed to update cape image for ${id}:`, e))
+  ]);
 
   if (existingUser) {
     // update user
